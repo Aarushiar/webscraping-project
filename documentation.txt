@@ -1,0 +1,65 @@
+
+1. Introduction
+
+This project aimed to create a Python application to collect data on AI-related projects from freelancing platforms. The initial goal was to scrape data from Upwork, Freelancer.com, or Fiverr. However, due to dynamic content loading, bot detection mechanisms, and website structure changes, we adapted the approach to ultimately use a pre-scraped dataset.
+
+This document outlines the different approaches explored, the challenges encountered, and the final solution implemented.
+
+2. Approaches 
+
+I explored three main approaches to collect the required data:
+
+Approach 1: Direct Web Scraping with Selenium (Initial Attempt)
+
+Description: The initial approach attempted to directly scrape AI-related project listings from Fiverr using Selenium for web browser automation and BeautifulSoup for HTML parsing.
+Implementation:
+Selenium was used to load the Fiverr homepage, handle dynamic JavaScript rendering, and switch to the <iframe> where the category links were located.
+WebDriverWait was employed to wait for specific elements to load within the <iframe>.
+BeautifulSoup was used to parse the HTML and extract relevant data points (project title, description, budget, etc.).
+Challenges:
+Dynamic Content Loading: Fiverr heavily relies on JavaScript to load content dynamically, making it difficult to pinpoint the exact timing and elements to wait for using Selenium.
+robots.txt Restrictions: Fiverr's robots.txt file limits the scraping of search result pages.
+Bot Detection: Fiverr employs bot detection mechanisms (like PerimeterX) that resulted in 403 Forbidden errors, preventing access to the site.
+Complex HTML Structure: The HTML structure of Fiverr's pages, especially with the use of iframes and dynamically generated elements, made it challenging to identify stable and reliable CSS selectors for data extraction.
+Outcome: This approach was ultimately unsuccessful due to persistent bot detection and the complexity of dynamic content loading.
+Approach 2: Capturing and Decoding the GIF (Intermediate Attempt)
+
+Description: After analyzing network traffic using the browser's developer tools, I discovered that Fiverr was sending encoded category data within a GIF image file. This approach attempted to capture the GIF using Selenium, save it, and then decode the data.
+Implementation:
+Selenium was used to load the Fiverr homepage and trigger the request for the GIF.
+The Network tab in the developer tools was used to identify the /g?payload=... request that returned the GIF data.
+The code was modified to capture the network request and save the response as a .gif file.
+Challenges:
+Encoded Data: The data within the GIF was encoded or encrypted, requiring further analysis to decipher the format and extract the information.
+Dynamic URL: The /g?payload=... URL contained a dynamically generated payload, making it difficult to construct the request directly without using Selenium to first load the page.
+Time Constraints: Reverse-engineering the encoding within the limited timeframe proved too complex.
+Outcome: While I successfully captured the GIF file, I decided to move to a more feasible approach due to the complexity of decoding the data within the project's time constraints.
+Approach 3: Using a Pre-Scraped Dataset (use it as final solution as due to somuch restiction on platform)
+
+Description: Due to the challenges encountered with direct scraping and the time limitations, we adopted a solution that utilizes a pre-scraped dataset of Fiverr gigs.
+Implementation:
+Dataset: I used the "Fiverr Gigs Dataset" (created in 2022) by talhabalaj, available on Kaggle: [invalid URL removed]
+Data Loading: The pandas library was used to load the dataset from the Fiverr.csv file.
+Data Filtering: The dataset was filtered to include only AI-related projects, based on keywords ("Artificial Intelligence" or "AI") in the relevant columns.
+Data Cleaning: NaN values were handled using appropriate strategies (replacing with default values or dropping rows/columns).
+Data Storage: The processed data was saved in JSON format using the json library.
+Advantages:
+Feasibility: This approach allowed us to quickly obtain relevant data and meet the core project requirements within the given timeframe.
+Demonstrates Skills: It still demonstrates proficiency in data loading, filtering, cleaning, and storage using Python libraries like pandas.
+Limitations:
+Data Freshness: The dataset is from 2022 and might not reflect the current state of Fiverr's platform or the AI-related projects available.
+Limited Scope: This approach doesn't involve real-time scraping of a live website.
+Outcome: This approach was successful in producing a structured JSON file containing data on AI-related projects from the dataset, fulfilling the project's core objectives.
+3. Code Structure
+
+The final code is structured as a Jupyter Notebook with the following cells:
+
+Cell 1: Installs necessary packages (pandas, openpyxl, python-dotenv).
+Cell 2: Imports libraries and configures logging. Defines the EXCEL_FILE (path to the downloaded dataset) and OUTPUT_FORMAT variables.
+Cell 3: Contains the ExcelDataProcessor class:
+load_and_filter_data(): Loads the Excel data using pandas, filters for AI-related projects, and converts the data to a list of dictionaries.
+clean_data(): Handles NaN values and performs data cleaning operations.
+Cell 4: Contains the DataHandler class:
+save_data(): Saves the processed data to a JSON or CSV file.
+Cell 5: Defines the main function, which orchestrates the data loading, processing, and saving.
+Cell 6: Calls the main function to run the script.
